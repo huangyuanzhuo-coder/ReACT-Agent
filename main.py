@@ -3,7 +3,7 @@ from tool_registry import ToolRegistry, Tools
 from tool_funcs import calculator, google_search
 
 if __name__ == "__main__":
-    agent = ReactAgent(model="gpt-4o")
+    agent = ReactAgent(model="qwen-max")
 
     agent.tools.add_tool(
         name_for_human="calculator",

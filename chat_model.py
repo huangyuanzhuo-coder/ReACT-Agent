@@ -1,6 +1,9 @@
 from typing import Dict, List, Optional, Tuple, Union
 import dotenv
 import os
+from openai import OpenAI
+
+from memory import Message
 
 dotenv.load_dotenv()
 
@@ -16,16 +19,11 @@ class BaseModel:
         pass
 
 
-if os.getenv('LANGFUSE_SECRET_KEY'):
-    from langfuse.openai import OpenAI
-else:
-    from openai import OpenAI
-
-
 class OpenAIChat(BaseModel):
     def __init__(self, path: str = '', **kwargs) -> None:
         super().__init__(path)
         self.load_model(**kwargs)
+        self.history: List[Message] = []
         self.kwargs = kwargs
 
     def load_model(self, **kwargs):
@@ -34,17 +32,21 @@ class OpenAIChat(BaseModel):
             base_url=os.getenv("OPENAI_API_BASE"),
         )
 
-    def chat(self, prompt: str, history: List[dict], meta_instruction: str = '') -> Tuple[str, List[dict]]:
+    def chat(self, prompt: str, history: List[Message], meta_instruction: str = '') -> str:
         """
         normal chat
         """
         is_verbose = self.kwargs.get('is_verbose', False)
-
-        # 拼接 系统提示词 和 历史对话信息
         messages = []
+
+        # 添加历史对话信息
+        history_dict = [dict(h) for h in history]
+        messages.extend(history_dict[-6:])  # 最新的 3 组对话
+
+        # 拼接 系统提示词
         if meta_instruction:
             messages.append({"role": "system", "content": meta_instruction})
-        messages.extend(history)
+
         messages.append({"role": "user", "content": prompt})
         response = self.client.chat.completions.create(
             messages=messages,
@@ -59,7 +61,7 @@ class OpenAIChat(BaseModel):
                 full_response += chunk.choices[0].delta.content
         if is_verbose:
             print()
-        return full_response, history
+        return full_response
 
 
 if __name__ == '__main__':

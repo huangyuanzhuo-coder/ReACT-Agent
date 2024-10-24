@@ -1,6 +1,8 @@
 import sys
 import os
 
+
+
 print(os.getcwd())
 print(os.path.join(os.getcwd(), "tools"))
 sys.path.append(os.path.abspath(os.getcwd()))
@@ -13,8 +15,7 @@ import json5
 from chat_model import OpenAIChat
 from tool_registry import ToolRegistry, Tools
 from prompts import REACT_PROMPT, TOOL_DESC
-import os, sys
-
+from memory import Message
 from tool_funcs import calculator, google_search, government_law_knowledgeBase
 
 
@@ -63,34 +64,25 @@ class ReactAgent:
             return '\nObservation:' + f"工具执行出错：{str(e)} 请检查输入参数是否正确"
 
     def step(self, scratchpad):
-        return self.model.chat(scratchpad, [], self.system_prompt)[0]
+        return self.model.chat(scratchpad, self.model.history, self.system_prompt)
 
     def run(self, query, extra_requirements=""):
         # 构建系统提示词
         self.system_prompt = self.build_system_input(query, extra_requirements)
-        print("system_prompt:", self.system_prompt)
+        # print("system_prompt:", self.system_prompt)
 
         # 初始化scratchpad
         scratchpad = ""
-
+        print(self.model.history)
         while True:
             response = self.step(scratchpad)  # 获取下一个响应[Analysis, Tool Invocation, Tool Input, Tool Output]
 
-            if response.startswith("Final Answer:"):
-                print("hit final answer")
-                self.hit_final_answer = True
-
-                # 取消只能输出一行的限制(stop=['\n'])，重新获取response
-                self.kwargs['stop'] = None
-                self.model.kwargs = self.kwargs
-                response = self.step(scratchpad)
-
-            elif response.startswith("Thought:"):
+            if response.startswith("Thought:"):
                 pass
             elif response.startswith("Action Input:"):
                 plugin_name, plugin_args = self.parse_latest_plugin_call(scratchpad + '\n' + response)
-                # print("using tool:", plugin_name)
-                # print("using args:", plugin_args)
+                print("using tool:", plugin_name)
+                print("using args:", plugin_args)
                 delta = self.call_plugin(plugin_name, plugin_args)
                 # print("delta:", delta)
                 response += delta
@@ -101,18 +93,30 @@ class ReactAgent:
             # 异常控制
             elif response.startswith("Observation:"):
                 response = "you shouldn't get Observation by yourself, you should get it from the tools"
-            else:
-                response = "Invalid Output prefix, please use one of the following the next time: [Thought, Action, Action Input, Observation]"
-            # print("--------------------------------")
-            print(response)
-            # print("--------------------------------\n\n")
-            scratchpad += '\n' + response
-            if self.hit_final_answer:
+
+            elif response.startswith("Final Answer:"):
+                # 取消只能输出一行的限制(stop=['\n'])，重新获取response
+                self.kwargs['stop'] = None
+                self.model.kwargs = self.kwargs
+                response = self.step(scratchpad)
+                print(response)
+
+                # 添加当前轮次对话
+                self.model.history.append(Message(role="user", content=query))
+                self.model.history.append(Message(role="system", content=response))
                 return response
+
+            else:
+                response = ("Invalid Output prefix, please use one of the following the next time: [Thought, Action, "
+                            "Action Input, Observation]")
+
+            print(response)
+            scratchpad += '\n' + response
+
 
 
 if __name__ == '__main__':
-    agent = ReactAgent(model="qwen-max")
+    agent = ReactAgent(model="qwen-max", temperature=1)
 
     agent.tools.add_tool(
         name_for_human="calculator",
@@ -157,6 +161,8 @@ if __name__ == '__main__':
         ],
     )
 
-    result = agent.run("保密法第三条和第四条有什么区别？")
+    result = agent.run("保密法的第三条和第四条有什么区别？")
+    print("-" * 150)
+    agent.run("第十一条是什么？")
     # result = agent.run(input("请输入问题："), extra_requirements=input("请输入额外要求："))
     # print(result)
