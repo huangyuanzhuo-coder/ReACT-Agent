@@ -36,7 +36,7 @@ class OpenAIChat(BaseModel):
         """
         normal chat
         """
-        is_verbose = self.kwargs.get('is_verbose', False)
+        is_verbose = self.kwargs.get('is_verbose', True)   # 流式输出
         messages = []
 
         # 添加历史对话信息
@@ -65,5 +65,5 @@ class OpenAIChat(BaseModel):
 
 
 if __name__ == '__main__':
-    model = OpenAIChat(model='qwen-max', temperature=0, stop=['\n'])
-    print(model.chat('输出一个唐诗', [])[0])
+    model = OpenAIChat(model='qwen-max', temperature=1, stop=['\n'])
+    print(model.chat('输出一个唐诗', []))

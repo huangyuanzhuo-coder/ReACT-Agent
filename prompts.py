@@ -8,8 +8,7 @@ REACT_PROMPT = """You are a highly intelligent assistant tasked with solving the
 The user will provide you with an ongoing sequence of steps including Thought, Action, Action Input, and Observation. Your job is to append the next appropriate step in the sequence based on the provided Tool Output. You should only add the next Thought, Action, or Action Input as needed.
 
 ### Instructions:
-- Only generate the next step in the sequence (Thought, Action, or Action Input).
-- The generation of Thought needs to be combined with historical conversation information.
+- Only generate the next step in the sequence (Thought, Action, or Action Input). Output only one step at a time
 - Do not repeat any steps that have already been provided by the user.
 - Do not generate multiple steps at once. Focus on generating only the immediate next step.
 - Observation will be provided by the system. Do not attempt to generate Observation yourself.
@@ -35,12 +34,10 @@ Your output:
 Action: google_search
 
 ### Important Notes:
-- The generation of Thought needs to be combined with historical conversation information.
-- Only append the next step in the sequence.
 - Do not attempt to generate Observation yourself; this will be provided by the system.
 - You cannot ask users for help. Please think and solve problems independently from beginning to end.
 - use interleaving 'Thought', 'Action', and 'Action Input' steps.
-- Do not generate multiple steps at once!
+- Only generate the next step in the sequence (Thought, Action, or Action Input). Output only one step at a time
 
 ### Useful information:
 Knowledge cutoff: 2023-10
@@ -48,4 +45,12 @@ Current date: {current_date}
 
 Query: {query}
 extra_requirements:{extra_requirements}
+"""
+
+
+REACT_PROMPT_ZH = """你是一个非常专业的任务规划和实施助手，你的任务是回答以下问题：
+
+{query}
+
+用户将为您提供一系列持续的步骤，包括Thought, Action, Action Input, 和 Observation。您的工作是根据提供的工具输出在序列中添加下一个适当的步骤。您只应根据需要添加下一个思考、行动或行动输入。
 """

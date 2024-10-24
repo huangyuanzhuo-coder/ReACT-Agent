@@ -2,7 +2,6 @@ import sys
 import os
 
 
-
 print(os.getcwd())
 print(os.path.join(os.getcwd(), "tools"))
 sys.path.append(os.path.abspath(os.getcwd()))
@@ -24,7 +23,7 @@ class ReactAgent:
         self.tools = Tools()
         kwargs['model'] = kwargs.get('model', 'qwen-max')
         kwargs['stop'] = kwargs.get('stop', ['\n'])
-        kwargs['temperature'] = kwargs.get('temperature', 0)
+        kwargs['temperature'] = kwargs.get('temperature', 1)
         self.kwargs = kwargs
         self.model = OpenAIChat(**kwargs)
         print("model info:", kwargs)
@@ -99,19 +98,21 @@ class ReactAgent:
                 self.kwargs['stop'] = None
                 self.model.kwargs = self.kwargs
                 response = self.step(scratchpad)
-                print(response)
+                # print(response)
 
                 # 添加当前轮次对话
                 self.model.history.append(Message(role="user", content=query))
-                self.model.history.append(Message(role="system", content=response))
+                self.model.history.append(Message(role="system", content=response.split("Final Answer:")[1]))
+                self.kwargs['stop'] = ['\n']
                 return response
 
             else:
                 response = ("Invalid Output prefix, please use one of the following the next time: [Thought, Action, "
                             "Action Input, Observation]")
 
-            print(response)
+            # print(response)
             scratchpad += '\n' + response
+            print("-" * 100)
 
 
 
