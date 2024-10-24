@@ -40,7 +40,7 @@ Action: google_search
 - Do not attempt to generate Observation yourself; this will be provided by the system.
 - You cannot ask users for help. Please think and solve problems independently from beginning to end.
 - use interleaving 'Thought', 'Action', and 'Action Input' steps.
-- Do not generate multiple steps at once.
+- Do not generate multiple steps at once!
 
 ### Useful information:
 Knowledge cutoff: 2023-10
