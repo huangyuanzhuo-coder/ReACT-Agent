@@ -1,0 +1,9 @@
+embedding_path:
+    company: 'D:\code_all\HuggingFace\bge-large-zh-v1.5'
+    home: 'D:\code\HuggingFace/bge-large-zh-v1.5'
+    linux: '/data1/hyz/bge-large-zh-v1.5'
+
+rerank_path:
+    company: 'D:\code_all\HuggingFace\bge-reranker-large'
+    home: 'D:\code\HuggingFace/bge-reranker-large'
+    linux: '/data1/hyz/bge-reranker-large'
