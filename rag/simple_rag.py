@@ -1,12 +1,13 @@
 import os
 from typing import Dict, Any, List, Iterator
-import torch
+
+import torch
 import yaml
 from langchain.chains import RetrievalQA
 from langchain.retrievers import EnsembleRetriever
 from langchain_community.chat_models import ChatTongyi
 from langchain_community.document_loaders import UnstructuredFileLoader, TextLoader, PyPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.retrievers import BM25Retriever, ElasticSearchBM25Retriever
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_text_splitters import CharacterTextSplitter

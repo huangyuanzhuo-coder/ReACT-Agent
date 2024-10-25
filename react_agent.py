@@ -1,7 +1,6 @@
 import sys
 import os
 
-
 print(os.getcwd())
 print(os.path.join(os.getcwd(), "tools"))
 sys.path.append(os.path.abspath(os.getcwd()))
@@ -69,51 +68,44 @@ class ReactAgent:
         # 构建系统提示词
         self.system_prompt = self.build_system_input(query, extra_requirements)
         # print("system_prompt:", self.system_prompt)
+        # print(self.model.history)
 
-        # 初始化scratchpad
         scratchpad = ""
-        print(self.model.history)
         while True:
             response = self.step(scratchpad)  # 获取下一个响应[Analysis, Tool Invocation, Tool Input, Tool Output]
 
-            if response.startswith("Thought:"):
+            if response.startswith("Thought:") or response.startswith("Action:"):
                 pass
             elif response.startswith("Action Input:"):
                 plugin_name, plugin_args = self.parse_latest_plugin_call(scratchpad + '\n' + response)
-                print("using tool:", plugin_name)
-                print("using args:", plugin_args)
-                delta = self.call_plugin(plugin_name, plugin_args)
-                # print("delta:", delta)
-                response += delta
-                # print("response:", response)
-            elif response.startswith("Action:"):
-                pass
+                # print("using tool:", plugin_name)
+                # print("using args:", plugin_args)
+                obs = self.call_plugin(plugin_name, plugin_args)
+                print(obs)
+                response += obs
+            elif response.startswith("Final Answer:"):
+                # 取消只能输出一行（下一step）的限制(stop=['\n'])，重新获取response
+                self.kwargs['stop'] = None
+                self.model.kwargs = self.kwargs
+                response = self.step(scratchpad)
+                self.kwargs['stop'] = ['\n']
+
+                # 添加当前轮次对话
+                self.model.history.append(Message(role="user", content=query))
+                self.model.history.append(Message(role="system", content=response.split("Final Answer: ")[1]))
+
+                return response
 
             # 异常控制
             elif response.startswith("Observation:"):
                 response = "you shouldn't get Observation by yourself, you should get it from the tools"
-
-            elif response.startswith("Final Answer:"):
-                # 取消只能输出一行的限制(stop=['\n'])，重新获取response
-                self.kwargs['stop'] = None
-                self.model.kwargs = self.kwargs
-                response = self.step(scratchpad)
-                # print(response)
-
-                # 添加当前轮次对话
-                self.model.history.append(Message(role="user", content=query))
-                self.model.history.append(Message(role="system", content=response.split("Final Answer:")[1]))
-                self.kwargs['stop'] = ['\n']
-                return response
-
             else:
                 response = ("Invalid Output prefix, please use one of the following the next time: [Thought, Action, "
                             "Action Input, Observation]")
 
             # print(response)
+            # print("-" * 100)
             scratchpad += '\n' + response
-            print("-" * 100)
-
 
 
 if __name__ == '__main__':
