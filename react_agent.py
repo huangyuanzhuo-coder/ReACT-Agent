@@ -154,7 +154,7 @@ if __name__ == '__main__':
         ],
     )
 
-    result = agent.run("保密法的第三条和第四条有什么区别？")
+    result = agent.run("保密法的第三条和第七条有什么区别？")
     print("-" * 150)
     agent.run("第十一条是什么？")
     # result = agent.run(input("请输入问题："), extra_requirements=input("请输入额外要求："))
