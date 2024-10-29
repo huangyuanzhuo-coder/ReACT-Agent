@@ -14,7 +14,7 @@ from chat_model import OpenAIChat
 from tool_registry import ToolRegistry, Tools
 from prompts import REACT_PROMPT, TOOL_DESC, REFINE_PROMPT, TEST_DOC
 from memory import Message
-from tool_funcs import calculator, google_search, government_law_knowledgeBase, context_generator
+from tool_funcs import calculator, google_search, government_law_knowledgeBase, context_generator, refine_doc
 
 
 class ReactAgent:
@@ -174,12 +174,27 @@ if __name__ == '__main__':
             }
         ],
     )
+    agent.tools.add_tool(
+        name_for_human='refine_doc',
+        name_for_model='refine_doc',
+        func=refine_doc,
+        description='refine_doc用于评判生成文档的质量',
+        parameters=[
+            {
+                'name': 'doc',
+                'description': '生成的文档',
+                'required': True,
+                'schema': {'type': 'string'},
+            }
+        ],
+    )
+
+
+    result = agent.run("我想生成一个有关政府官员贪污受贿的举报信")
+    print("-" * 150)
 
     # 测试反思
     prompt = REFINE_PROMPT.format(doc=TEST_DOC)
-
-    result = agent.run("我想生成一个有关中美关系局势紧张的新闻")
-    print("-" * 150)
     # agent.run("第十一条是什么？")
     # result = agent.run(input("请输入问题："), extra_requirements=input("请输入额外要求："))
     # print(result)

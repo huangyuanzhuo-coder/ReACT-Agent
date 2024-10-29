@@ -2,7 +2,7 @@ import os
 import json
 import requests
 import dotenv
-from prompts import CONTEXT_GENERATION_PROMPT, OUTLINE_PROMPT, PART_PROMPT
+from prompts import CONTEXT_GENERATION_PROMPT, OUTLINE_PROMPT, PART_PROMPT, REFINE_PROMPT
 from chat_model import OpenAIChat
 from md2docx import md_to_docx
 from rag.simple_rag import RAG_search
@@ -31,17 +31,14 @@ def government_law_knowledgeBase(search_query: str):
     return RAG_search(search_query)
 
 
+
+
 def context_generator(area, doc_type):
     context_generator_prompt = CONTEXT_GENERATION_PROMPT.format(doc_type=doc_type,
                                                                 area=area)
-    kwargs = {}
-    kwargs['model'] = kwargs.get('model', 'qwen-max')
-    # kwargs['stop'] = kwargs.get('stop', ['\n'])
-    kwargs['temperature'] = kwargs.get('temperature', 1)
-    kwargs = kwargs
-    model = OpenAIChat(**kwargs)
+
+    model = OpenAIChat(model='qwen-max', temperature=1)
     res = model.chat("", [], context_generator_prompt)
-    # print(res)
 
     # 保存文件
     md_to_docx(res, f"./docs/{area}：{doc_type}.docx")
@@ -59,14 +56,11 @@ def outline_generator(area, doc_type):
 组成部分：
     """
     outline_prompt = OUTLINE_PROMPT + doc_prompt
-    kwargs = {}
-    kwargs['model'] = kwargs.get('model', 'qwen-max')
-    kwargs['temperature'] = kwargs.get('temperature', 1)
-    kwargs = kwargs
-    model = OpenAIChat(**kwargs)
+
+    model = OpenAIChat(model='qwen-max', temperature=1)
     res = model.chat("", [], outline_prompt)
 
-    # print(res)
+    return res
 
 
 def partition_generator(area, doc_type, outline):
@@ -77,14 +71,20 @@ def partition_generator(area, doc_type, outline):
 组成部分：
 """
     part_prompt = PART_PROMPT + doc_prompt
-    kwargs = {}
-    kwargs['model'] = kwargs.get('model', 'qwen-max')
-    kwargs['temperature'] = kwargs.get('temperature', 1)
-    kwargs = kwargs
-    model = OpenAIChat(**kwargs)
+
+    model = OpenAIChat(model='qwen-max', temperature=1)
     res = model.chat("", [], part_prompt)
 
-    # print(res)
+    return res
+
+
+def refine_doc(doc):
+    refine_prompt = REFINE_PROMPT.format(doc=doc)
+
+    model = OpenAIChat(model='qwen-max', temperature=1)
+    res = model.chat("", [], refine_prompt)
+
+    return res
 
 
 if __name__ == '__main__':
