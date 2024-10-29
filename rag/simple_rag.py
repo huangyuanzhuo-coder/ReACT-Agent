@@ -1,6 +1,5 @@
 import os
 from typing import Dict, Any, List, Iterator
-
 import torch
 import yaml
 from langchain.chains import RetrievalQA
@@ -12,6 +11,7 @@ from langchain_community.retrievers import BM25Retriever, ElasticSearchBM25Retri
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_text_splitters import CharacterTextSplitter
 import dotenv
+
 dotenv.load_dotenv()
 
 llm = ChatTongyi()
@@ -22,7 +22,6 @@ EMBEDDING_PATH = params["embedding_path"]["linux"]
 RERANK_PATH = params["rerank_path"]["linux"]
 
 EMBEDDING_DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-#EMBEDDING_DEVICE = "cpu"
 
 
 def dao_loader(filepath):

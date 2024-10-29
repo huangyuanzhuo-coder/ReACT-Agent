@@ -12,9 +12,9 @@ from typing import Dict, List, Optional, Tuple, Union
 import json5
 from chat_model import OpenAIChat
 from tool_registry import ToolRegistry, Tools
-from prompts import REACT_PROMPT, TOOL_DESC
+from prompts import REACT_PROMPT, TOOL_DESC, REFINE_PROMPT, TEST_DOC
 from memory import Message
-from tool_funcs import calculator, google_search, government_law_knowledgeBase
+from tool_funcs import calculator, google_search, government_law_knowledgeBase, context_generator
 
 
 class ReactAgent:
@@ -104,13 +104,14 @@ class ReactAgent:
                             "Action Input, Observation]")
 
             # print(response)
-            # print("-" * 100)
+            print("-" * 100)
             scratchpad += '\n' + response
 
 
 if __name__ == '__main__':
     agent = ReactAgent(model="qwen-max", temperature=1)
 
+    # 注册工具
     agent.tools.add_tool(
         name_for_human="calculator",
         name_for_model="calculator",
@@ -143,7 +144,7 @@ if __name__ == '__main__':
         name_for_human='government_law_knowledgeBase',
         name_for_model='government_law_knowledgeBase',
         func=government_law_knowledgeBase,
-        description='government_law_knowledgeBase一个文档知识库，用于查询法律、政府文件的相关内容。',
+        description='government_law_knowledgeBase是一个文档知识库，用于查询法律、政府文件的相关内容。',
         parameters=[
             {
                 'name': 'search_query',
@@ -153,9 +154,32 @@ if __name__ == '__main__':
             }
         ],
     )
+    agent.tools.add_tool(
+        name_for_human='context_generator',
+        name_for_model='context_generator',
+        func=context_generator,
+        description='context_generator用于生成指定领域和类型的文档',
+        parameters=[
+            {
+                'name': 'area',
+                'description': '文件的领域、事件',
+                'required': True,
+                'schema': {'type': 'string'},
+            },
+            {
+                'name': 'doc_type',
+                'description': '文件的类型',
+                'required': True,
+                'schema': {'type': 'string'},
+            }
+        ],
+    )
 
-    result = agent.run("保密法的第三条和第七条有什么区别？")
+    # 测试反思
+    prompt = REFINE_PROMPT.format(doc=TEST_DOC)
+
+    result = agent.run("我想生成一个有关中美关系局势紧张的新闻")
     print("-" * 150)
-    agent.run("第十一条是什么？")
+    # agent.run("第十一条是什么？")
     # result = agent.run(input("请输入问题："), extra_requirements=input("请输入额外要求："))
     # print(result)

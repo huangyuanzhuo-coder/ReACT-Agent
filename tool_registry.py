@@ -51,28 +51,13 @@ class Tools:
     def toolConfig(self):
         return self.registry.get_tool_configs()
 
-    # def google_search(self, search_query: str):
-    #     url = "https://google.serper.dev/search"
-    #
-    #     payload = json.dumps({"q": search_query})
-    #     headers = {
-    #         'X-API-KEY': os.getenv('SERPER_API_KEY'),
-    #         'Content-Type': 'application/json'
-    #     }
-    #
-    #     response = requests.request("POST", url, headers=headers, data=payload).json()
-    #
-    #     return response['organic'][0]['snippet']
-    #
-    # def calculator(self, expression: str):
-    #     return eval(expression)
-
     def add_tool(self, name_for_human: str, name_for_model: str, func: Callable, description: str,
                  parameters: list = []):
         self.registry.register(name_for_human, name_for_model, func, description, parameters)
 
     def execute_tool(self, name: str, **kwargs):
         return self.registry.execute_tool(name, **kwargs)
+
 
 
 if __name__ == '__main__':
