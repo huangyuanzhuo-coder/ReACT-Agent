@@ -56,3 +56,6 @@ def function_schema(name: str, description: str, required_params: List[str]):
         return wrapper
 
     return decorator_function
+
+
+# __all__ = ['function_schema']

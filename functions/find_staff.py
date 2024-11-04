@@ -1,12 +1,4 @@
-import sys
-
 from functions.functions_metadata import function_schema
-
-print(sys.path)
-import os
-print(os.environ.get('PYTHONPATH'))
-import functions.functionsRegistry
-
 
 
 @function_schema(

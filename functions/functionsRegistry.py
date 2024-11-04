@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 
 class FunctionsRegistry:
     def __init__(self) -> None:
-        # self.functions_dir = Path(__file__).parent / 'functions'  # API 函数存放文件夹
-        self.functions_dir = Path('./')  # API 函数存放文件夹
+        self.functions_dir = Path(__file__).parent  # API 函数存放文件夹
         self.registry: Dict[str, callable] = {}
         self.schema_registry: Dict[str, Dict] = {}
         self.load_functions()
