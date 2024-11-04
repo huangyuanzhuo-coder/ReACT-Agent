@@ -31,8 +31,6 @@ def government_law_knowledgeBase(search_query: str):
     return RAG_search(search_query)
 
 
-
-
 def context_generator(area, doc_type):
     context_generator_prompt = CONTEXT_GENERATION_PROMPT.format(doc_type=doc_type,
                                                                 area=area)

@@ -190,7 +190,7 @@ if __name__ == '__main__':
     )
 
 
-    result = agent.run("我想生成一个有关政府官员贪污受贿的举报信")
+    result = agent.run("水利厅和国土资源部有什么关系吗？")
     print("-" * 150)
 
     # 测试反思
