@@ -2,7 +2,6 @@ import sys
 import os
 import json5
 from datetime import datetime
-
 print(sys.path)
 print(os.getcwd())
 sys.path.append(os.path.abspath(os.getcwd()))
@@ -108,86 +107,10 @@ class ReactAgent:
 if __name__ == '__main__':
     agent = ReactAgent(model="qwen-max", temperature=1)
 
-    # # 注册工具
-    # agent.tools.add_tool(
-    #     name_for_human="calculator",
-    #     name_for_model="calculator",
-    #     func=calculator,
-    #     description="calculator是一个用于进行数学计算的工具。",
-    #     parameters=[
-    #         {
-    #             'name': 'expression',
-    #             'description': '可以被python eval 函数执行的数学表达式',
-    #             'required': True,
-    #             'schema': {'type': 'string'},
-    #         }
-    #     ]
-    # )
-    # agent.tools.add_tool(
-    #     name_for_human="google search",
-    #     name_for_model="google_search",
-    #     func=google_search,
-    #     description="google search是一个通用搜索引擎，可用于访问互联网、查询百科知识、了解时事新闻等。",
-    #     parameters=[
-    #         {
-    #             'name': 'search_query',
-    #             'description': '搜索关键词或短语',
-    #             'required': True,
-    #             'schema': {'type': 'string'},
-    #         }
-    #     ]
-    # )
-    # agent.tools.add_tool(
-    #     name_for_human='government_law_knowledgeBase',
-    #     name_for_model='government_law_knowledgeBase',
-    #     func=government_law_knowledgeBase,
-    #     description='government_law_knowledgeBase是一个文档知识库，用于查询法律、政府文件的相关内容。',
-    #     parameters=[
-    #         {
-    #             'name': 'search_query',
-    #             'description': '搜索关键词或短语',
-    #             'required': True,
-    #             'schema': {'type': 'string'},
-    #         }
-    #     ],
-    # )
-    # agent.tools.add_tool(
-    #     name_for_human='context_generator',
-    #     name_for_model='context_generator',
-    #     func=context_generator,
-    #     description='context_generator用于生成指定领域和类型的文档',
-    #     parameters=[
-    #         {
-    #             'name': 'area',
-    #             'description': '文件的领域、事件',
-    #             'required': True,
-    #             'schema': {'type': 'string'},
-    #         },
-    #         {
-    #             'name': 'doc_type',
-    #             'description': '文件的类型',
-    #             'required': True,
-    #             'schema': {'type': 'string'},
-    #         }
-    #     ],
-    # )
-    # agent.tools.add_tool(
-    #     name_for_human='refine_doc',
-    #     name_for_model='refine_doc',
-    #     func=refine_doc,
-    #     description='refine_doc用于评判生成文档的质量',
-    #     parameters=[
-    #         {
-    #             'name': 'doc',
-    #             'description': '生成的文档',
-    #             'required': True,
-    #             'schema': {'type': 'string'},
-    #         }
-    #     ],
-    # )
-
-    result = agent.run("水利厅和国土资源部有什么关系吗？")
+    result = agent.run("刘强东创办京东时多少岁？")
     print("-" * 150)
+    result = agent.run("奶茶妹呢？")
+
 
     # 测试反思
     prompt = REFINE_PROMPT.format(doc=TEST_DOC)

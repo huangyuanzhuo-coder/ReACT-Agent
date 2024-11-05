@@ -2,7 +2,6 @@ from typing import List
 import dotenv
 import os
 from openai import OpenAI
-
 from react_agent.memory import Message
 
 dotenv.load_dotenv()
