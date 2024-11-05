@@ -1,37 +1,19 @@
-import os
-import json
-import requests
-import dotenv
-from prompts import CONTEXT_GENERATION_PROMPT, OUTLINE_PROMPT, PART_PROMPT, REFINE_PROMPT
 from chat_model import OpenAIChat
-from md2docx import md_to_docx
-from rag.simple_rag import RAG_search
-
-dotenv.load_dotenv()
-
-
-# 添加计算器工具
-def calculator(expression: str):
-    return eval(expression)
+from react_agent.function_call.register.functions_metadata import function_schema
+from react_agent.function_call.tools.md2docx import md_to_docx
+from react_agent.prompt.prompts import CONTEXT_GENERATION_PROMPT, OUTLINE_PROMPT, PART_PROMPT, REFINE_PROMPT
 
 
-# 添加谷歌搜索工具
-def google_search(search_query: str):
-    url = "https://google.serper.dev/search"
-    payload = json.dumps({"q": search_query})
-    headers = {
-        'X-API-KEY': os.getenv('SERPER_API_KEY'),
-        'Content-Type': 'application/json'
-    }
-    response = requests.request("POST", url, headers=headers, data=payload).json()
-    return response['organic'][0]['snippet']
-
-
-def government_law_knowledgeBase(search_query: str):
-    return RAG_search(search_query)
-
-
+@function_schema(
+    name="context_generator",
+    description="context_generator用于生成指定领域和类型的文档",
+    required_params=["area", "doc_type"]
+)
 def context_generator(area, doc_type):
+    """
+    :param area: 文件的领域、事件
+    :param doc_type: 文件的类型
+    """
     context_generator_prompt = CONTEXT_GENERATION_PROMPT.format(doc_type=doc_type,
                                                                 area=area)
 
@@ -83,9 +65,3 @@ def refine_doc(doc):
     res = model.chat("", [], refine_prompt)
 
     return res
-
-
-if __name__ == '__main__':
-    # context_generator("正文", "工作秘密", "定向电磁调制设备核心原理")
-
-    outline_generator("通知", "保密项目实施条例")

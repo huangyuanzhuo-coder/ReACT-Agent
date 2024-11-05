@@ -17,8 +17,6 @@ The user will provide you with an ongoing sequence of steps including Thought, A
 - Reflect on past decisions and strategies to refine your approach.
 - If you get the final answer, you should use the format "Final Answer: <answer>" to provide the final response.
 
-### Tool Descriptions:
-{tool_descs}
 
 ### Task Execution Example:
 

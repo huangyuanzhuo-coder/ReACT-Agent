@@ -1,14 +1,14 @@
-from typing import List, Dict, Any
-import dotenv
-from openai import OpenAI
-from dotenv import load_dotenv
 import os
 import logging
 import json
+import dotenv
+from typing import List, Dict
+from openai import OpenAI
+from dotenv import load_dotenv
+
+from react_agent.function_call.register.functionsRegistry import FunctionsRegistry
 
 dotenv.load_dotenv()
-from functions.functionsRegistry import FunctionsRegistry
-
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
@@ -16,9 +16,7 @@ logging.basicConfig(level=logging.INFO)
 def main() -> None:
     load_dotenv()
     question = (
-            "大唐华银电力股份有限公司法人与上海现代制药股份有限公司发生了民事纠纷，大唐华银电力股份有限公司委托给了北京国旺律师事务所，" +
-            "上海现代制药股份有限公司委托给了北京浩云律师事务所" +
-            "请写一份民事起诉状给天津市蓟州区人民法院时间是2024-02-01，注：法人的地址电话可用公司的代替。")
+            "大唐华银电力股份有限公司法人代表是谁")
     # question = ""
     try:
         client = OpenAI(
@@ -27,19 +25,21 @@ def main() -> None:
         )
 
         tools = FunctionsRegistry()
+        print(tools.mapped_functions())
         function_map = tools.get_function_callable()
 
         messages: List[Dict[str, str]] = [
             {"role": "user", "content": f"{question}"}
         ]
         completion = client.chat.completions.create(
-            model="qwen-max",
+            model="qwen-plus",
             messages=messages,
             tools=tools.mapped_functions(),
             tool_choice="auto",
         )
 
         response_message = completion.choices[0].message
+        print(response_message)
         # 依据问题选择需要调用的函数列表
         tool_calls = response_message.tool_calls
 
@@ -68,12 +68,13 @@ def main() -> None:
                         logging.error(f"Error in {function_name}: {e}")
 
             second_completion = client.chat.completions.create(
-                model="qwen-max",
+                model="qwen-plus",
                 messages=messages
             )
-
+            print(second_completion)
             logging.info(second_completion)
         else:
+            print("没有工具调用")
             logging.info(completion)
 
     except Exception as e:

@@ -1,9 +1,9 @@
-from typing import Dict, List, Optional, Tuple, Union
+from typing import List
 import dotenv
 import os
 from openai import OpenAI
 
-from memory import Message
+from react_agent.memory import Message
 
 dotenv.load_dotenv()
 
@@ -32,10 +32,12 @@ class OpenAIChat(BaseModel):
             base_url=os.getenv("OPENAI_API_BASE"),
         )
 
-    def chat(self, prompt: str, history: List[Message], meta_instruction: str = '') -> str:
+    def chat(self, prompt: str, history: List[Message], meta_instruction: str = '', tools=None) -> str:
         """
         normal chat
         """
+        if tools is None:
+            tools = {}
         is_verbose = self.kwargs.get('is_verbose', True)   # 流式输出
         messages = []
 
@@ -51,6 +53,8 @@ class OpenAIChat(BaseModel):
         response = self.client.chat.completions.create(
             messages=messages,
             stream=True,
+            tools=tools,
+            tool_choice="auto",
             **self.kwargs
         )
         full_response = ""
